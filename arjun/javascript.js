@@ -203,7 +203,7 @@ $(window).load(function() {
 		if(!hasError) {
 			$.ajax({
 				type: "POST",
-				url: "email.php",
+				url: "me.php",
 				data: dataString, 
 				success: function(){  
 					$('#form-message').html('Your Message successfully submitted.');

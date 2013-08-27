@@ -18,7 +18,7 @@ $(window).load(function() {
 	$('nav a, nav select, #top-button').click(function(){
 		$('html, body').animate({scrollTop: ($(this.hash).position().top - 60) + "px"}, 700);
 		return false;
-	});
+	});p
 	
 	$(window).scroll(function(){
 		$('section').each(function() {
@@ -199,7 +199,7 @@ $(window).load(function() {
 		'&email=' + email +
 		'&phone=' + phone +
 		'&message=' + messg;
-		
+		alert('dd');
 		if(!hasError) {
 			$.ajax({
 				type: "POST",

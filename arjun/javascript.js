@@ -168,7 +168,7 @@ $(window).load(function() {
 	//
 	// Checking the form data and sending via ajax call
 	$('form input[type="submit"]').on('click', function() {
-		
+		 alert('cc');
 		var fname = $('form input[name="fname"]').val();
 		var lname = $('form input[name="lname"]').val();
 		var email = $('form input[name="email"]').val();
@@ -199,7 +199,7 @@ $(window).load(function() {
 		'&email=' + email +
 		'&phone=' + phone +
 		'&message=' + messg;
-		
+		alert(dataString);
 		if(!hasError) {
 			$.ajax({
 				type: "POST",

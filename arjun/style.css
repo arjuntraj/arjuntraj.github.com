@@ -961,3 +961,12 @@ form textarea {
 		width: 80%;
 	}
 }
+.myClass b, .bolder{
+
+ 
+font-family: 'Lato', sans-serif;
+color: #444;
+margin: 0;
+
+
+}

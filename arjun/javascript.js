@@ -173,6 +173,7 @@ $(window).load(function() {
 		var lname = $('form input[name="lname"]').val();
 		var email = $('form input[name="email"]').val();
 		var phone = $('form input[name="phone"]').val();
+		var subject = $('form input[name="subject"]').val();
 		var messg = $('form textarea').val();
 		
 		var hasError = false;
@@ -198,8 +199,9 @@ $(window).load(function() {
 		'&lname=' + lname +
 		'&email=' + email +
 		'&phone=' + phone +
+		'&subject=' + subject +
 		'&message=' + messg;
-		 alert("Thanl you");
+		 
 		if(!hasError) {
 			$.ajax({
 				type: "POST",
@@ -207,6 +209,10 @@ $(window).load(function() {
 				data: dataString, 
 				success: function(){  
 					$('#form-message').html('Your Message successfully submitted.');
+				},error: function(){
+
+
+					alert(hasError);
 				}   
 			});
 		}

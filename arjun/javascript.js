@@ -9,7 +9,11 @@ $(window).load(function() {
 	
 	// Mobile nav menu (select) location
 	$("nav select").change(function() {
+		if($(this).find("option:selected").val() == "CV") {
+		window.open("http://www.arjuntraj.in/resume.doc");	
+		} else {
 		$('html, body').animate({scrollTop: ($($(this).find("option:selected").val()).position().top - 60) + "px"}, 700);
+		}
 	});
 	
 	//

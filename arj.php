@@ -9,7 +9,7 @@ $formImage = imagecreatefromstring($data);
 
 
 header("Cache-Control: no-cache, must-revalidate");
-header('Content-type: image/png');
+header('Content-type: image/jpeg');
 imagejpeg($formImage);
 imagedestroy($formImage);
 ?>

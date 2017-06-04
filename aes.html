@@ -35,10 +35,18 @@ AESDecrypt = function(string,password){
 function de(){
 var pw = $("#pw").val();
  var txt = $("#txt").val();
+ 
+ try {
 var result = AESDecrypt(txt,pw);
  
  $("#decryptedText").html(result);
   $("#txt").val("");
+ } catch() {
+  $("#txt").val("");
+  alert("invalid password / encrypted string");
+ 
+ 
+ }
 
 }
  

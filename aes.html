@@ -26,6 +26,18 @@ return encrypted;
 
 }
 AESDecrypt = function(string,password){return CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(string, password))}
+
+
+function de(){
+var pw = $("#pw").val();
+ var txt = $("#txt").val();
+var result = AESDecrypt(txt,pw);
+ 
+ $("#decryptedText").html(result);
+
+
+}
+
 </script>
 
 
@@ -45,7 +57,9 @@ AESDecrypt = function(string,password){return CryptoJS.enc.Utf8.stringify(Crypto
    <div data-reactroot="" class="container">
     <div class="row"><div class="col-md-6"><h3>Input Text</h3>
      
-     <textarea class="form-control" rows="4" cols="40">Enter your text here</textarea><hr><input placeholder="password"><hr></div></div>
+     <textarea id="txt" class="form-control" rows="4" cols="40">Enter your text here</textarea><hr>
+     
+     <input id="pw" placeholder="password"><hr></div></div>
     
     
     <div class="row"><div class="col-md-6"><h3>Encrypted Text:</h3>
@@ -65,9 +79,9 @@ AESDecrypt = function(string,password){return CryptoJS.enc.Utf8.stringify(Crypto
      
      
      
+     <br><br>
      
-     
-     <button> decrypt </button>
+     <button onclick="de();"> decrypt </button>
      
      
      </div></div></div></div>

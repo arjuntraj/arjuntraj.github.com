@@ -6,7 +6,7 @@ p{word-wrap: break-word;}
 </style>
 <title> ARJUN T RAJ | CryptoJS  |</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/aes.js"></script>
+<script src="http://emwdx.github.io/encryption-example/js/bower_components/crypto-js/crypto-js.js"></script>
    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
   crossorigin="anonymous"></script>
@@ -25,7 +25,11 @@ return encrypted;
 
 
 }
-AESDecrypt = function(string,password){return CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(string, password))}
+AESDecrypt = function(string,password){
+ 
+ return CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(string, password))
+
+}
 
 
 function de(){

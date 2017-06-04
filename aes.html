@@ -41,7 +41,7 @@ var result = AESDecrypt(txt,pw);
  
  $("#decryptedText").html(result);
   $("#txt").val("");
- } catch() {
+ } catch(e) {
   $("#txt").val("");
   alert("invalid password / encrypted string");
  

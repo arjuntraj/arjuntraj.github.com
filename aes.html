@@ -76,7 +76,7 @@ var pw = $("#pw").val();
 
 <body>
 <div class="container">
-  <h1>Crypto JS Tool</h1>
+  <h1> RAK </h1>
   <div class="row">
     <div class="col-md-8 col-md-offset-2">
       
@@ -88,36 +88,36 @@ var pw = $("#pw").val();
    <div data-reactroot="" class="container">
     <div class="row"><div class="col-md-6"><h3>Enter encrypted string from sqlite DB / updated JSON string </h3>
      
-     <textarea id="txt" placeholder="enter string" class="form-control" rows="4" cols="40"></textarea><hr>
+     <textarea id="txt" placeholder="enter string or JSON" class="form-control" rows="4" cols="40"></textarea><hr>
      
-     <input id="pw" placeholder="password"><hr></div></div>
+     <input id="pw" placeholder="username + password"><hr></div></div>
     
     
     <div class="row"><div class="col-md-6"><h3>Encrypted Text:</h3>
      
-     
+      <button onclick="e();"> Encrypt </button>
+     <br><br>
      <p id="encryptedText"></p>
      
      
-      <br><br>
+      
      
-     <button onclick="e();"> Encrypt </button>
-     
+    
      </div>
     
     
     
     <div class="col-md-6"><h3>Decrypted JSON :</h3>
      
-      
+      <button onclick="de();"> Decrypt </button>
+     <br><br>
      <p id="decryptedText"></p>
      
      
      
      
-     <br><br>
      
-     <button onclick="de();"> Decrypt </button>
+     
      
      
      </div></div></div></div>

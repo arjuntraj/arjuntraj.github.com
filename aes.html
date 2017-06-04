@@ -1,1 +1,157 @@
-123
+ <html><head><meta charset="utf-8" <html="" lang="en">
+
+
+<style>
+p{word-wrap: break-word;}
+</style>
+<title> ARJUN T RAJ | CryptoJS  |</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/aes.js"></script>
+   <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script>
+SHA256 = function(string){return CryptoJS.SHA256(string).toString(CryptoJS.enc.Base64)};
+SHA512 = function(string){return CryptoJS.SHA512(string).toString(CryptoJS.enc.Base64)};
+SHA3 = function(string){return CryptoJS.SHA3(string).toString(CryptoJS.enc.Base64)};
+
+AESEncrypt = function(string,password){
+
+var encrypted = CryptoJS.AES.encrypt(string, password)
+
+//console.log("ciphertext: "+ encrypted.toString(CryptoJS.enc.Utf8) + " ,key: "+encrypted.key.toString(CryptoJS.enc.Utf8))
+return encrypted;
+
+
+
+}
+AESDecrypt = function(string,password){return CryptoJS.enc.Utf8.stringify(CryptoJS.AES.decrypt(string, password))}
+</script>
+
+
+</head>
+
+<body>
+<div class="container">
+  <h1>Encryption Tool</h1>
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <p class="lead">
+
+        This page uses the AES encryption algorithm from the CryptoJS library. Play around with the inputs and observe the following:
+        </p><ul>
+          <li>What do you observe about the size of the encrypted text compared with the input text and the password?</li>
+          <li>Is it possible to double or triple encrypt a message?</li>
+
+        </ul>
+      <p></p>
+
+    </div>
+</div>
+  <div id="container"><div data-reactroot="" class="container"><div class="row"><div class="col-md-6"><h3>Input Text</h3><textarea class="form-control" rows="4" cols="40">Enter your text here</textarea><hr><input placeholder="password"><hr></div></div><div class="row"><div class="col-md-6"><h3>Encrypted Text:</h3><p id="encryptedText" width="100%">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</p></div><div class="col-md-6"><h3>Decrypted Text:</h3><p id="decryptedText" width="100%">{"syncStatus":"FAILED_TO_SUBMIT","customerAddress":{"residentCountry":"UAE","countryCode":"971","countryName":"UAE","emailId":"sharaf@rakbank.ae","state":"Dubai","city":"Dubai","addressLine1":"Axis 7","postBox":"12312"},"nationalityCode":"IND","mobileNumber":"123456789","passportNumber":"K12132","firstName":"AR","lastName":"T","middleName":"R","gender":"M","emiratesIdNumber":"12131231233","birthDate":"10/01/1988","emiratesIdExpiryDate":"10/01/2222","nationality":"IND","cnfrmMobileNumber":"123456789","customerDocumentList":[{"documentType":"PPT","documentSubType":"PPT1","fileSize":1024,"filePath":"1495006843896.rakcache","fileContents":""},{"documentType":"PPT","documentSubType":"PPT2","fileSize":1024,"filePath":"1495006884264.rakcache","fileContents":""},{"documentType":"VISA","documentSubType":"VISA1","fileSize":1024,"filePath":"1495006821672.rakcache","fileContents":""},{"documentType":"EID","documentSubType":"EID1","fileSize":1024,"filePath":"1495006876203.rakcache","fileContents":""},{"documentType":"EID","documentSubType":"EID2","fileSize":1024,"filePath":"1495006832904.rakcache","fileContents":""}],"emiratesIdCardNumber":"1111111111113","dsaUserId":"sibasha","applicationNumber":"1495006841761","createdDate":"17/05/2017 11:40","datesLapsed":0,"selected":true}</p></div></div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.1/react-dom.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+
+<script type="text/babel">
+
+var App = new React.createClass({
+
+render: function(){
+
+return (
+  <div className = "container">
+  <div className="row">
+  <div className = "col-md-6">
+  <h3>Input Text</h3>
+<textarea className = "form-control" ref="inputText" rows = "4" cols = "40" onChange = {this.changeInput}  value={this.state.inputText} onPaste = {this.pasteInput}></textarea>
+<hr/>
+<input ref = "inputPassword" onChange = {this.changePass} onPaste = {this.pastePass} placeholder = "password" value = {this.state.password}/>
+<hr/>
+</div>
+</div>
+<div className="row">
+<div className = "col-md-6">
+<h3>Encrypted Text:</h3>
+<p id = "encryptedText" width = "100%" ref = "encryptedText" >{this.state.encryptedText}</p>
+</div>
+<div className = "col-md-6">
+<h3>Decrypted Text:</h3>
+<p id = "decryptedText" width = "100%" ref = "decryptedText" >{this.state.decryptedText}</p>
+</div>
+</div>
+
+
+
+</div>
+);
+
+
+
+},
+getInitialState:function(){
+
+return {
+  inputText:this.props.inputText.toString(CryptoJS.enc.Utf8),
+  password:"password".toString(CryptoJS.enc.Utf8),
+  encryptedText:AESEncrypt(this.props.inputText.toString(CryptoJS.enc.Utf8),"password".toString(CryptoJS.enc.Utf8)).toString(),
+  decryptedText:AESDecrypt(this.props.inputText.toString(CryptoJS.enc.Utf8),"password".toString(CryptoJS.enc.Utf8))};
+
+},
+changePass:function(e){
+
+this.setState({
+  password:e.target.value,
+  encryptedText:AESEncrypt(this.state.inputText.toString(CryptoJS.enc.Utf8),e.target.value.toString(CryptoJS.enc.Utf8)).toString(),
+  decryptedText:AESDecrypt(this.state.inputText.toString(CryptoJS.enc.Utf8),e.target.value.toString(CryptoJS.enc.Utf8))});
+
+},
+changeInput:function(e){
+
+this.setState({
+  inputText:e.target.value,
+  encryptedText:AESEncrypt(e.target.value.toString(CryptoJS.enc.Utf8),this.state.password.toString(CryptoJS.enc.Utf8)).toString(),
+  decryptedText:AESDecrypt(e.target.value.toString(CryptoJS.enc.Utf8),this.state.password.toString(CryptoJS.enc.Utf8))})
+
+},
+
+pastePass:function(e){
+  var clipboardText = e.clipboardData.getData('Text')
+
+  this.setState({
+    password:clipboardText.toString(CryptoJS.enc.Utf8),
+    encryptedText:AESEncrypt(this.state.inputText.toString(CryptoJS.enc.Utf8),e.target.value.toString(CryptoJS.enc.Utf8)).toString(),
+    decryptedText:AESDecrypt(this.state.inputText.toString(CryptoJS.enc.Utf8),e.target.value.toString(CryptoJS.enc.Utf8))});
+
+
+
+  
+
+
+},
+
+pasteInput:function(e){
+
+
+var clipboardText = e.clipboardData.getData('Text')
+
+  this.setState({
+    inputText:clipboardText.toString(CryptoJS.enc.Utf8),
+    encryptedText:AESEncrypt(clipboardText.toString(CryptoJS.enc.Utf8),this.state.password.toString(CryptoJS.enc.Utf8)).toString(),
+    decryptedText:AESDecrypt(clipboardText.toString(CryptoJS.enc.Utf8),this.state.password.toString(CryptoJS.enc.Utf8))})
+
+
+}
+
+});
+
+ReactDOM.render(
+  <App inputText = {"Enter your text here"}/>,
+  document.getElementById('container')
+);
+
+</script>
+
+
+</div></body></html>

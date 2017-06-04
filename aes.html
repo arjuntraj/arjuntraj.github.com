@@ -38,17 +38,26 @@ var pw = $("#pw").val();
 var result = AESDecrypt(txt,pw);
  
  $("#decryptedText").html(result);
-
+  $("#txt").val("");
 
 }
  
  function e(){
 var pw = $("#pw").val();
  var txt = $("#txt").val();
-var result = AESEncrypt(txt,pw);
+  
+  
+  try{
+   
+   var jsonTxt = JSON.parse(txt);
+  var result = AESEncrypt(txt,pw);
  
- $("#encryptedText").html(result.toString());
-
+    $("#encryptedText").html(result.toString());
+  } catch(e){
+       alert("Please enter valid JSON string.");
+       $("#txt").val("");
+  
+  }
 
 }
 

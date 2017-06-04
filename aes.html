@@ -41,6 +41,16 @@ var result = AESDecrypt(txt,pw);
 
 
 }
+ 
+ function e(){
+var pw = $("#pw").val();
+ var txt = $("#txt").val();
+var result = AESEncrypt(txt,pw);
+ 
+ $("#encryptedText").html(result);
+
+
+}
 
 </script>
 
@@ -71,6 +81,11 @@ var result = AESDecrypt(txt,pw);
      
      <p id="encryptedText"></p>
      
+     
+      <br><br>
+     
+     <button onclick="e();"> Encrypt </button>
+     
      </div>
     
     
@@ -85,7 +100,7 @@ var result = AESDecrypt(txt,pw);
      
      <br><br>
      
-     <button onclick="de();"> decrypt </button>
+     <button onclick="de();"> Decrypt </button>
      
      
      </div></div></div></div>

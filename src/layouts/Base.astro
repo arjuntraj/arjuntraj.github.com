@@ -67,7 +67,10 @@ const personLd = {
           <a href="/#releases">Release notes</a>
           <a href="/#stack">Skills</a>
           <a href="/#signal">Signal</a>
-          <a href="/#off-the-clock">Off the clock</a>
+          <a href="/#off-the-clock" class="nav-ico">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10.5h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c-.6.8-.6 1.7 0 2.5M11.5 3.5c-.6.8-.6 1.7 0 2.5" /></svg>
+            Off the clock
+          </a>
           <a href="/#contact">Contact</a>
         </nav>
         <button type="button" class="theme" data-theme-toggle aria-label="Switch light or dark theme">
@@ -187,6 +190,9 @@ const personLd = {
   nav { display: flex; gap: 22px; font-size: 0.9rem; }
   nav a { text-decoration: none; color: var(--ink-2); transition: color 0.2s; }
   nav a:hover { color: var(--ink); }
+  .nav-ico { display: inline-flex; align-items: center; gap: 6px; }
+  .nav-ico svg { fill: none; stroke: var(--accent-ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s var(--ease); }
+  .nav-ico:hover svg { transform: rotate(-12deg); }
   .theme { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
   .theme:hover { border-color: var(--ink); }
   .foot { border-top: 1px solid var(--line); margin-top: 40px; }

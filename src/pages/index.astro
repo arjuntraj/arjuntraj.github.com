@@ -108,7 +108,7 @@ const builtOn = day.format(new Date());
     <header class="sec-head">
       <p class="eyebrow">Stack</p>
       <h2 id="stack-h">Skills</h2>
-      <p class="sec-lede">Agentic engineering, React Native and native iOS and Android, and the web platforms behind them. Built from Dubai for teams in Abu Dhabi, across the UAE and the wider GCC.</p>
+      <p class="sec-lede">Agentic AI engineering, React Native, native iOS and Android, and the web platforms behind them. Based in Dubai, working across the UAE and the GCC.</p>
     </header>
 
     <ul class="groups">
@@ -168,10 +168,14 @@ const builtOn = day.format(new Date());
         {offClock.lines.map((l) => (
           <li>
             <span class="glyph" aria-hidden="true">
-              {l.icon === 'coffee' ? (
+              {l.icon === 'coffee' && (
                 <svg viewBox="0 0 24 24"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10.5h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c-.6.8-.6 1.7 0 2.5M11.5 3.5c-.6.8-.6 1.7 0 2.5" /></svg>
-              ) : (
+              )}
+              {l.icon === 'family' && (
                 <svg viewBox="0 0 24 24"><circle cx="8" cy="6" r="2.5" /><path d="M3.5 20v-5a4.5 4.5 0 0 1 9 0v5" /><circle cx="16.5" cy="10" r="2" /><path d="M13.5 20v-3a3 3 0 0 1 6 0v3" /><circle cx="20.5" cy="13.5" r="1.3" /></svg>
+              )}
+              {l.icon === 'farm' && (
+                <svg viewBox="0 0 24 24"><path d="M12 20v-8M12 12c0-3.5 2.5-6 6.5-6 0 3.8-2.6 6-6.5 6zM12 14c0-3-2.2-5-5.5-5 0 3.2 2.3 5 5.5 5zM4 20h16" /></svg>
               )}
             </span>
             {l.text}

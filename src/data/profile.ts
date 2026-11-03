@@ -5,7 +5,7 @@ export const since = (year: number) => NOW.getFullYear() - year;
 
 export const profile = {
   name: 'Arjun T Raj',
-  role: 'Agentic AI Engineer & React Native Developer',
+  role: 'Engineering Leader, Digital & AI Architect',
   location: 'Dubai, UAE',
   timezone: 'Asia/Dubai',
   email: 'mail@arjuntraj.in',
@@ -98,6 +98,7 @@ export const offClock = {
   lines: [
     { icon: 'coffee', text: 'Coffee first, code second.' },
     { icon: 'family', text: 'Father of two.' },
+    { icon: 'farm', text: 'Farmer at heart, happiest with my hands in the soil.' },
   ],
   links: [
     { kicker: 'Website', label: "Adveka's website", note: 'My daughter has her own corner of the internet.', href: 'https://advekatarjun.com/', cta: 'advekatarjun.com' },

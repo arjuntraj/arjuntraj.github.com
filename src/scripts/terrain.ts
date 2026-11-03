@@ -58,6 +58,19 @@ const MIST: RGB = hex('#f4f1f8');
 
 const baseAt = (z: number) => 0.4 + z * 0.06; // The land rises as you go deeper.
 
+// A river falls off the mountain and winds back toward the trailhead through notches in each ridge.
+const WATER = hex('#bfe3ff');
+// It leaves the waterfall's foot (x≈8.8) and settles into a meander along the camera's path.
+const riverX = (z: number) => {
+  const k = clamp01((z - (SUMMIT_Z - 12)) / 11);
+  const settle = k * k * (3 - 2 * k);
+  const meander = 1.5 + Math.sin(z * 0.16) * 3.2 + Math.sin(z * 0.43) * 0.8;
+  return meander + (8.8 - meander) * settle;
+};
+const riverY = (z: number) => baseAt(z) - 0.25;
+// Half-width in world units: a stream at the waterfall's foot, widening downstream.
+const riverHalf = (z: number) => 0.32 + 0.55 * clamp01((SUMMIT_Z - z) / 14);
+
 // Illikkal Kallu, traced from a front-on reference photo. Points are in its pixels (585×341, y down,
 // mountain foot at y=300, summit knob at x≈308) and mapped to world units around PEAK_X.
 const PEAK_X = 6;
@@ -80,6 +93,11 @@ const SLAB_MOSS = [[240, 110], [250, 70], [275, 52], [296, 44], [286, 62], [262,
 const STREAKS = [[258, 128, 264, 162, 7], [272, 198, 280, 240, 8], [298, 232, 306, 264, 6], [326, 118, 320, 160, 5], [287, 88, 291, 122, 4]];
 // Forest gullies down the green slopes.
 const GULLIES = [[150, 130, 120, 230], [180, 90, 160, 210], [205, 70, 196, 250], [372, 120, 400, 230], [410, 165, 445, 260], [350, 90, 360, 200]];
+// Waterfall from a spring beside the rock face down to the mountain's foot (photo pixels). Near the
+// bottom it turns out toward the viewer, the way the river leaves the foot in perspective. It ends
+// exactly where the river starts: riverX/riverY at SUMMIT_Z, mapped back into photo pixels.
+const FALL_FOOT = [308 + (8.8 - PEAK_X) / PEAK_K, 300 + 0.25 / PEAK_K];
+const FALL = [[355, 118], [357, 128], [359, 139], [361, 150], [369, 180], [380, 212], [388, 240], [393, 264], [397, 284], [403, 298], [409, 305], FALL_FOOT];
 const ROCK_LIT = hex('#d6cdbf'), ROCK_MID = hex('#a19890'), ROCK_DARK = hex('#5a5560');
 const RUST = hex('#c4542e');
 const FOREST = hex('#7fae3e'), FOREST_DARK = hex('#1f3a18'), CLIFF_TONE = hex('#3e4a3a'), CAP = hex('#4c6a2a');
@@ -93,7 +111,11 @@ function buildWorld() {
     const amp = 1.4 + r() * 1.6;
     const heights = Array.from({ length: SAMPLES }, (_, s) => {
       const x = -SPAN + (2 * SPAN * s) / (SAMPLES - 1);
-      return baseAt(z) + amp * (0.7 * n1(x * 0.08 + i * 7) + 0.3 * n2(x * 0.3 + i * 3));
+      const h = baseAt(z) + amp * (0.7 * n1(x * 0.08 + i * 7) + 0.3 * n2(x * 0.3 + i * 3));
+      // Carve the river's valley so the water shows through each ridge.
+      // Flat across the water's full width, then sloping up into the ridge.
+      const g = Math.exp(-((Math.max(0, Math.abs(x - riverX(z)) - 1.2) / 3.2) ** 2));
+      return h - (h - riverY(z)) * g;
     });
     const tone = i % 3 === 1 ? GRASS : BLOOM;
     const flowers = tone === BLOOM
@@ -210,6 +232,20 @@ export function startFlight(canvas: HTMLCanvasElement, opts: { reduced: boolean 
 
     const project = (x: number, y: number, dz: number) => [W / 2 + ((x - camX) * focal) / dz, horizon + ((camY - y) * focal) / dz];
 
+    // A smooth path through points, curving through the midpoints between them.
+    const curve = (pts: number[][], start = true) => {
+      if (start) ctx.moveTo(pts[0][0], pts[0][1]); else ctx.lineTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length - 1; i++) {
+        ctx.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+      }
+      ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+    };
+
+    // The waterfall's banks and a painter for its surface. The river draws the waterfall and its own
+    // first stretch as one outline, then paints the waterfall on top, so there is no seam between them.
+    type Fall = { left: number[][]; right: number[][]; paint: () => void };
+    let fallStream: Fall | null = null;
+
     const landmark = (dz: number, fog: number) => {
       const pt = ([px, py]: number[]) => project(PEAK_X + (px - 308) * PEAK_K, baseAt(SUMMIT_Z) + (300 - py) * PEAK_K, dz);
       const tint = (c: RGB, a = 1) => css(mix(c, haze, fog), a);
@@ -269,6 +305,107 @@ export function startFlight(canvas: HTMLCanvasElement, opts: { reduced: boolean 
 
       ctx.fillStyle = tint(ROCK_DARK);
       trace(KNOB); ctx.closePath(); ctx.fill();
+
+      // Waterfall: a tapered stream that widens as it falls, with streaks flowing at different
+      // speeds inside it, a glow at the spring and churning foam where it meets the river.
+      const fall = FALL.map(pt);
+      const n = fall.length;
+      const footHalf = (riverHalf(SUMMIT_Z) / PEAK_K) * unit;
+      // Widths are measured level across the screen, the same way the river's are, so the two sets of
+      // banks continue into each other without a notch at the hand-over.
+      const edges = fall.map(([x, y], i) => {
+        const hw = footHalf * Math.min(1, i / (n - 2)) ** 0.75; // A point at the spring, full width just above the foot.
+        return { x, y, nx: 1, ny: 0, hw };
+      });
+      // The banks stop one cross-section short of the foot; the river's outline carries on from there.
+      const side = (k: number) => edges.slice(0, n - 1).map((e) => [e.x + e.nx * e.hw * k, e.y + e.ny * e.hw * k]);
+      const paint = () => {
+      ctx.beginPath();
+      curve(side(-1));
+      curve(side(1).reverse(), false);
+      ctx.closePath();
+      const [, topY] = fall[0], [, footY] = fall[n - 2];
+      const sheet = ctx.createLinearGradient(0, topY, 0, footY);
+      // Fade in from the rock so the water seeps out of the slope rather than starting on an edge.
+      sheet.addColorStop(0, tint([236, 247, 255], 0));
+      sheet.addColorStop(0.12, tint([236, 247, 255], 0.9));
+      sheet.addColorStop(1, css(mix(mix(WATER, haze, 0.2), haze, fog * 0.8), 1)); // Same as the river.
+      ctx.fillStyle = sheet;
+      ctx.fill();
+      ctx.save();
+      ctx.clip();
+      ctx.lineCap = 'butt';
+      for (const [k, dash, gap, speed, a, w] of [[-0.45, 6, 10, 90, 0.75, 1.4], [0, 14, 8, 130, 0.95, 2.2], [0.5, 4, 12, 70, 0.6, 1.2]]) {
+        ctx.beginPath();
+        curve(side(k));
+        ctx.setLineDash([unit * dash, unit * gap]);
+        ctx.lineDashOffset = -time * unit * speed;
+        const streak = ctx.createLinearGradient(0, topY, 0, footY);
+        streak.addColorStop(0, 'rgba(255,255,255,0)');
+        streak.addColorStop(0.2, `rgba(255,255,255,${a * (1 - fog)})`);
+        ctx.strokeStyle = streak;
+        ctx.lineWidth = Math.max(0.8, unit * w);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.restore();
+      // A faint wet glint where the spring breaks out of the slope.
+      puff(fall[1][0], fall[1][1], unit * 4, unit * 6, `rgba(255,255,255,${0.35 * (1 - fog)})`);
+      const [fx, fy] = fall[n - 1];
+      for (let i = 0; i < 3; i++) {
+        const beat = 1 + 0.18 * Math.sin(time * 3.2 + i * 2.1);
+        puff(fx + (i - 1) * footHalf * 0.6, fy - unit * 2, footHalf * 1.4 * beat, unit * 5 * beat, `rgba(255,255,255,${0.45 * (1 - fog)})`);
+      }
+      puff(fx, fy - unit * 6, footHalf * 3, unit * 12, css(mix(MIST, haze, fog), 0.35 * (1 - fog)));
+      };
+      fallStream = { left: side(-1), right: side(1), paint };
+    };
+
+    // One stretch of river between two depths, with glints drifting toward the camera.
+    const river = (zFar: number, zNear: number, fog: number, alpha: number, fall: Fall | null = null) => {
+      zNear = Math.max(zNear, camZ + 0.8);
+      if (zFar <= zNear || alpha < 0.01) return;
+      const steps = fall ? 40 : 10; // Finer below the waterfall so the hand-over is smooth.
+      const left: number[][] = [], right: number[][] = [];
+      for (let k = 0; k <= steps; k++) {
+        const z = zFar + ((zNear - zFar) * k) / steps;
+        const dz = z - camZ;
+        left.push(project(riverX(z) - riverHalf(z), riverY(z), dz));
+        right.push(project(riverX(z) + riverHalf(z), riverY(z), dz));
+      }
+      const water = css(mix(mix(WATER, haze, 0.2), haze, fog * 0.8), fall ? alpha : alpha * 0.95);
+      ctx.beginPath();
+      if (fall) {
+        // Waterfall and river as one smooth outline (skipping the river's level first edge).
+        curve([...fall.left, ...left.slice(1)]);
+        curve([...fall.right, ...right.slice(1)].reverse(), false);
+      } else {
+        left.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+        for (let k = right.length - 1; k >= 0; k--) ctx.lineTo(right[k][0], right[k][1]);
+      }
+      ctx.closePath();
+      ctx.fillStyle = water;
+      ctx.fill();
+      fall?.paint();
+      // A bright line along the far bank, where the water catches the sky.
+      ctx.beginPath();
+      (fall ? right.slice(2) : right).forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.strokeStyle = `rgba(255,255,255,${0.5 * alpha * (1 - fog)})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      const len = zFar - zNear;
+      for (let i = 0; i < 5; i++) {
+        const z = zFar - wrap(time * 1.1 + i * 0.73 + zFar * 0.37, 0, len);
+        const dz = z - camZ;
+        const [gx, gy] = project(riverX(z) + Math.sin(i * 2.1 + zFar) * riverHalf(z) * 0.45, riverY(z), dz);
+        const rx = Math.min(40, (riverHalf(z) * 0.55 * focal) / dz);
+        if (rx < 0.6) continue;
+        ctx.fillStyle = `rgba(255,255,255,${0.55 * alpha * (1 - fog)})`;
+        ctx.beginPath();
+        ctx.ellipse(gx, gy, rx, Math.max(0.5, rx * 0.16), 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
     };
 
     const mistBank = (b: Bank, dz: number) => {
@@ -304,7 +441,11 @@ export function startFlight(canvas: HTMLCanvasElement, opts: { reduced: boolean 
       if (dz < 0.6) continue; // Already flown over.
       const fog = ridge.peak ? clamp01((dz - 10) / 60) * 0.7 : clamp01((dz - 2) / FOG_DEPTH);
       if (fog >= 0.995) continue;
-      if (ridge.peak) { landmark(dz, fog); continue; }
+      if (ridge.peak) {
+        landmark(dz, fog);
+        river(SUMMIT_Z, 4 + (COUNT - 1) * GAP, fog, 1, fallStream);
+        continue;
+      }
       // Ridges very close to the camera fade out instead of popping.
       const near = clamp01((dz - 0.6) / 1.4);
 
@@ -336,6 +477,9 @@ export function startFlight(canvas: HTMLCanvasElement, opts: { reduced: boolean 
         ctx.fillStyle = mist;
         ctx.fillRect(0, baseY - H * 0.08, W, H * 0.12);
       }
+
+      // The river runs over the valley mist so each stretch joins the next without a band across it.
+      river(ridge.z, ridge.z - GAP, fog, near);
 
       // Neelakurinji flowers on the slopes that are close enough to see.
       if (ridge.flowers.length && dz < 12) {

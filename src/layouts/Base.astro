@@ -1,0 +1,186 @@
+---
+import '@fontsource-variable/anybody/standard.css';
+import '@fontsource-variable/ibm-plex-sans';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/500.css';
+import { profile } from '../data/profile';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description = profile.description } = Astro.props;
+const fullTitle = title ? `${title} — ${profile.name}` : `${profile.name} · ${profile.role}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  image: new URL('/avatar.jpg', Astro.site).toString(),
+  url: Astro.site?.toString(),
+  jobTitle: profile.role,
+  address: { '@type': 'PostalAddress', addressLocality: 'Dubai', addressCountry: 'AE' },
+  sameAs: profile.links.map((l) => l.href),
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="profile" />
+    <meta property="og:image" content={new URL('/avatar.jpg', Astro.site)} />
+    <meta name="twitter:card" content="summary" />
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+    <script is:inline>
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="top">
+      <div class="shell top-row">
+        <a href="/" class="mark" aria-label={`${profile.name}, home`}>
+          <img src="/avatar.jpg" alt="" width="36" height="36" decoding="async" />
+          <span>{profile.name}</span>
+        </a>
+        <nav aria-label="Sections">
+          <a href="/#releases">Release notes</a>
+          <a href="/#stack">Skills</a>
+          <a href="/#contact">Contact</a>
+        </nav>
+        <button type="button" class="theme" data-theme-toggle aria-label="Switch light or dark theme">
+          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="1.6" /><path d="M10 3a7 7 0 0 1 0 14z" fill="currentColor" /></svg>
+        </button>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="foot">
+      <div class="shell foot-row mono">
+        <span>© {new Date().getFullYear()} {profile.name}</span>
+        <span>{profile.location}</span>
+      </div>
+    </footer>
+
+    <script>
+      document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+        const root = document.documentElement;
+        const current = root.dataset.theme ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const next = current === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        try { localStorage.setItem('theme', next); } catch {}
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* Layout: a single 12-column shell; the hero name runs full width, everything else sits on an offset grid. */
+  :root {
+    --bg: #eceeea;
+    --surface: #f6f7f4;
+    --ink: #111814;
+    --ink-2: #48524c;
+    --line: #cfd5cf;
+    --accent: #e8a317;
+    --accent-ink: #8f5d00;
+    --added: #217a4b;
+    --improved: #2d5f9a;
+    --removed: #a8402f;
+
+    --display: 'Anybody Variable', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+    --body: 'IBM Plex Sans Variable', 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+    --max: 1320px;
+    --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --bg: #0d1210;
+      --surface: #151b18;
+      --ink: #e7ebe5;
+      --ink-2: #9ba69f;
+      --line: #27302b;
+      --accent: #f2b233;
+      --accent-ink: #f2b233;
+      --added: #5cc48b;
+      --improved: #7fb0ea;
+      --removed: #f08a76;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme='dark'] {
+    --bg: #0d1210;
+    --surface: #151b18;
+    --ink: #e7ebe5;
+    --ink-2: #9ba69f;
+    --line: #27302b;
+    --accent: #f2b233;
+    --accent-ink: #f2b233;
+    --added: #5cc48b;
+    --improved: #7fb0ea;
+    --removed: #f08a76;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 72px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--body); font-size: 17px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  body::before { content: ''; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--bg); }
+  a { color: inherit; text-underline-offset: 3px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  ::selection { background: var(--accent); color: #111814; }
+  h1, h2, h3 { text-wrap: balance; }
+  .shell {
+    max-width: var(--max); margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px), 4vw);
+    padding-right: max(16px, env(safe-area-inset-right, 0px), 4vw);
+  }
+  .mono { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.01em; }
+  .eyebrow { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); margin: 0; }
+  .skip { position: absolute; left: 12px; top: -60px; z-index: 100; background: var(--ink); color: var(--bg); padding: 8px 12px; }
+  .skip:focus { top: calc(12px + env(safe-area-inset-top, 0px)); }
+</style>
+
+<style>
+  .top {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  }
+  .top-row { display: flex; align-items: center; gap: 24px; height: 60px; }
+  .mark { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-family: var(--display); font-weight: 800; font-variation-settings: 'wdth' 115; font-size: 1.02rem; letter-spacing: 0.01em; text-decoration: none; margin-right: auto; }
+  .mark img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--accent); transition: transform 0.3s var(--ease); }
+  .mark:hover img { transform: scale(1.06) rotate(-3deg); }
+  nav { display: flex; gap: 22px; font-size: 0.9rem; }
+  nav a { text-decoration: none; color: var(--ink-2); transition: color 0.2s; }
+  nav a:hover { color: var(--ink); }
+  .theme { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .theme:hover { border-color: var(--ink); }
+  .foot { border-top: 1px solid var(--line); margin-top: 40px; }
+  .foot-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding-block: 22px calc(22px + env(safe-area-inset-bottom, 0px)); color: var(--ink-2); }
+  @media (max-width: 720px) { nav { display: none; } }
+</style>

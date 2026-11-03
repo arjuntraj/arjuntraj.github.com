@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Not found">
+  <section class="nf shell">
+    <p class="eyebrow">Error 404</p>
+    <h1>This route isn't in any release.</h1>
+    <a class="back" href="/">Back to the home page →</a>
+  </section>
+</Base>
+
+<style>
+  .nf { padding-block: clamp(64px, 12vw, 160px); }
+  h1 { margin: 10px 0 24px; font-family: var(--display); font-weight: 800; font-variation-settings: 'wdth' 120, 'wght' 800; font-size: clamp(2.4rem, 7vw, 5.6rem); line-height: 0.92; max-width: 14ch; }
+  .back { display: inline-flex; align-items: center; min-height: 44px; }
+</style>

@@ -1,0 +1,466 @@
+---
+import Base from '../layouts/Base.astro';
+import { profile, facts, releases, earlier, skillGroups } from '../data/profile';
+import { getHeadlines } from '../data/news';
+
+const lines = ['ARJUN', 'T RAJ'];
+// Highlight groups cycle through these tones.
+const tones = ['--ink', '--improved', '--added', '--removed', '--accent-ink'];
+
+// The background is an illustrated flight over Neelakurinji ridges; the altitude gauge tops out here.
+const SUMMIT = 2640;
+
+const headlines = await getHeadlines();
+const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: profile.timezone });
+const builtOn = day.format(new Date());
+---
+<Base>
+  <div class="sky" aria-hidden="true">
+    <canvas data-sky></canvas>
+    <div class="scrim"></div>
+  </div>
+
+  <div class="hud mono" aria-hidden="true" data-summit={SUMMIT}>
+    <span class="hud-top">{SUMMIT.toLocaleString('en-GB')}</span>
+    <span class="hud-track" data-hud-track><span class="hud-fill"></span><span class="hud-mark"></span></span>
+    <span class="hud-val"><span data-alt>0</span> m</span>
+  </div>
+
+  <section class="hero shell" data-hero aria-labelledby="hero-name">
+    <div class="meta mono">
+      <span>{profile.location} · <time data-clock>--:--</time> GST</span>
+    </div>
+
+    <h1 id="hero-name" class="name" aria-label={profile.name}>
+      {lines.map((line, li) => (
+        <span class:list={['line', `l${li}`]} aria-hidden="true" data-line>
+          {[...line].map((ch) => (ch === ' ' ? <span class="sp"> </span> : <span class="ch">{ch}</span>))}
+        </span>
+      ))}
+    </h1>
+
+    <div class="below">
+      <p class="intro">{profile.intro}</p>
+      <dl class="facts">
+        {facts.map((f) => (
+          <div><dt class="mono">{f.label}</dt><dd>{f.value}</dd></div>
+        ))}
+      </dl>
+      <div class="cta">
+        <a class="btn solid" href="#contact">Get in touch</a>
+        <a class="btn" href="#releases">Read the release notes</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="window" aria-hidden="true">
+    <p class="cap mono">Waypoint 01 · The ridgeline</p>
+  </div>
+
+  <section id="releases" class="releases shell" aria-labelledby="rel-h">
+    <div class="panel">
+    <header class="sec-head">
+      <p class="eyebrow">CHANGELOG.md</p>
+      <h2 id="rel-h">Release notes</h2>
+      <p class="sec-lede">Where I am now, in full. Earlier roles are folded into one line.</p>
+    </header>
+
+    <ol class="rel-list">
+      {releases.map((r) => (
+        <li class="rel">
+          <div class="rel-tag">
+            <span class="rel-y mono">Current</span>
+            <span class="rel-v">{r.role}</span>
+          </div>
+          <div class="rel-body">
+            <h3>{r.title}</h3>
+            <dl class="wins">
+              {r.groups.map((g, i) => (
+                <div class="win" style={`--tone: var(${tones[i % tones.length]})`}>
+                  <dt class="mono">{g.label}</dt>
+                  <dd><ul>{g.items.map((item) => <li>{item}</li>)}</ul></dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </li>
+      ))}
+      <li class="rel earlier">
+        <div class="rel-tag">
+          <span class="rel-y mono">Before that</span>
+          <span class="rel-v">{earlier.role}</span>
+        </div>
+        <div class="rel-body">
+          <h3>{earlier.title}</h3>
+          <p>{earlier.summary}</p>
+        </div>
+      </li>
+    </ol>
+    </div>
+  </section>
+
+  <div class="window" aria-hidden="true">
+    <p class="cap mono">Waypoint 02 · Following the trail</p>
+  </div>
+
+  <section id="stack" class="stack shell" aria-labelledby="stack-h">
+    <div class="panel">
+    <header class="sec-head">
+      <p class="eyebrow">Stack</p>
+      <h2 id="stack-h">Skills</h2>
+      <p class="sec-lede">What I reach for, grouped. Not everything I've used, just what I lead with.</p>
+    </header>
+
+    <ul class="groups">
+      {skillGroups.map((g, i) => (
+        <li class="group">
+          <span class="g-n mono">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{g.name}</h3>
+          <ul class="chips">{g.skills.map((skill) => <li>{skill}</li>)}</ul>
+        </li>
+      ))}
+    </ul>
+    </div>
+  </section>
+
+  <div class="window" aria-hidden="true">
+    <p class="cap mono">Waypoint 03 · Through the bloom</p>
+  </div>
+
+  {headlines.length > 0 && (
+    <section class="news shell" aria-labelledby="news-h">
+      <div class="panel">
+      <header class="sec-head">
+        <p class="eyebrow">Signal · Updated {builtOn}</p>
+        <h2 id="news-h">Latest from the AI world</h2>
+        <p class="sec-lede">Pulled automatically each morning from AI labs and tech newsrooms. Each card links to the original story.</p>
+      </header>
+      <div class="ticker" data-ticker style={`--dur: ${headlines.length * 5}s`}>
+        {[0, 1].map((copy) => (
+          <ul class="tick-row" inert={copy === 1} aria-hidden={copy === 1 ? 'true' : undefined}>
+            {headlines.map((h) => (
+              <li>
+                <a href={h.url} target="_blank" rel="noopener noreferrer nofollow">
+                  <span class="t-src mono">{h.source} · {day.format(h.published)}</span>
+                  <span class="t-title">{h.title}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+      <div class="tick-foot">
+        <button type="button" class="btn small" data-tick-toggle aria-pressed="false">Pause</button>
+        <p class="mono">Third-party headlines; I don't control their content.</p>
+      </div>
+      </div>
+    </section>
+  )}
+
+  <section id="contact" class="contact" aria-labelledby="contact-h">
+    <div class="shell contact-inner">
+      <p class="eyebrow">Summit · {SUMMIT.toLocaleString('en-GB')} m · Next release</p>
+      <h2 id="contact-h" class="big">Let's build the next one.</h2>
+      <div class="mail">
+        <a href={`mailto:${profile.email}`} class="addr">{profile.email}</a>
+        <button type="button" class="btn copy" data-copy={profile.email}><span data-copy-label>Copy email</span></button>
+      </div>
+      <ul class="links">
+        {profile.links.map((l) => (
+          <li><a href={l.href} target="_blank" rel="me noopener noreferrer">{l.label}<span aria-hidden="true"> ↗</span></a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Sky: the footage sits fixed behind the whole page; the scroll script moves the camera. */
+  .sky { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #0c0b1d; }
+  .sky canvas { width: 100%; height: 100%; display: block; }
+  .scrim { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgb(8 7 20 / 0.45) 100%), linear-gradient(rgb(8 7 20 / 0.15), rgb(8 7 20 / 0.3)); }
+
+  /* Scenes over the footage are always dark, whatever the theme. */
+  .hero, .contact, .window {
+    --bg: #0c0b1d; --ink: #f3f1ff; --ink-2: rgb(243 241 255 / 0.74); --line: rgb(243 241 255 / 0.26);
+    --accent: #b9b0ff; --accent-ink: #b9b0ff; --added: #7ee2a8; color: var(--ink);
+  }
+
+  /* Altitude gauge: page progress as height above the trailhead. */
+  .hud { --p: 0; position: fixed; right: max(14px, env(safe-area-inset-right, 0px)); top: 50%; translate: 0 -50%; z-index: 40; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 6px; border-radius: 999px; font-size: 0.66rem; color: rgb(243 241 255 / 0.75); background: rgb(12 11 29 / 0.45); border: 1px solid rgb(243 241 255 / 0.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-variant-numeric: tabular-nums; }
+  .hud-track { position: relative; width: 2px; height: 30vh; background: rgb(243 241 255 / 0.2); border-radius: 2px; cursor: grab; touch-action: none; }
+  /* Wider invisible hit area so the 2px line is easy to grab. */
+  .hud-track::before { content: ''; position: absolute; inset: -8px -14px; }
+  .hud.dragging .hud-track { cursor: grabbing; }
+  .hud-mark { transition: scale 0.2s var(--ease); }
+  .hud-track:hover .hud-mark, .hud.dragging .hud-mark { scale: 1.35; }
+  .hud-fill { position: absolute; inset: auto 0 0; height: calc(var(--p) * 100%); background: #b9b0ff; border-radius: 2px; }
+  .hud-mark { position: absolute; left: 50%; bottom: calc(var(--p) * 100%); width: 10px; height: 10px; translate: -50% 50%; border-radius: 50%; background: #b9b0ff; box-shadow: 0 0 0 4px rgb(185 176 255 / 0.25); }
+  .hud-val, .hud-top { writing-mode: vertical-rl; rotate: 180deg; }
+  .hud-val { color: #fff; min-height: 7ch; }
+
+  /* Windows: open sky between sections, where the camera flies to the next shot. */
+  .window { height: 72svh; display: grid; place-items: end center; padding-bottom: 6svh; }
+  .cap { margin: 0; padding: 8px 14px; border-radius: 999px; background: rgb(12 11 29 / 0.5); border: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.7rem; }
+
+  /* Content panels float over the footage like frosted glass. */
+  .panel { background: color-mix(in srgb, var(--bg) 90%, transparent); border: 1px solid color-mix(in srgb, var(--line) 80%, transparent); border-radius: 28px; padding: clamp(20px, 4vw, 56px); backdrop-filter: blur(20px) saturate(1.2); -webkit-backdrop-filter: blur(20px) saturate(1.2); box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.5); }
+  :global(.foot) { background: var(--bg); margin-top: 0 !important; }
+
+  /* Hero */
+  .hero { min-height: calc(100svh - 60px); display: flex; flex-direction: column; justify-content: flex-end; padding-block: clamp(28px, 5vw, 56px) clamp(32px, 5vw, 64px); border-image: fill 0 linear-gradient(to top, rgb(8 7 20 / 0.7), transparent 60%); border-image-outset: 0 100vw; text-shadow: 0 1px 24px rgb(0 0 0 / 0.35); }
+  .meta { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px 24px; color: var(--ink-2); padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+
+  .name {
+    margin: clamp(16px, 3vw, 32px) 0 0; font-family: var(--display); font-weight: 800;
+    font-size: clamp(4.6rem, 21vw, 19rem); line-height: 0.82; letter-spacing: -0.02em;
+    font-variation-settings: 'wdth' 100, 'wght' 800;
+    touch-action: pan-y; user-select: none; -webkit-user-select: none;
+  }
+  .line { display: flex; white-space: nowrap; }
+  .l1 { justify-content: flex-end; }
+  .ch { display: inline-block; font-variation-settings: 'wdth' var(--w, 100), 'wght' var(--g, 800); }
+  .l1 .ch:last-child { color: var(--accent); }
+  .sp { display: inline-block; width: 0.28em; }
+
+  .below { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-areas: 'intro facts' 'cta facts'; gap: 24px clamp(24px, 5vw, 80px); margin-top: clamp(24px, 4vw, 48px); align-items: start; }
+  .intro { grid-area: intro; margin: 0; font-size: clamp(1.2rem, 2vw, 1.55rem); line-height: 1.4; max-width: 34ch; letter-spacing: -0.01em; }
+  .facts { grid-area: facts; margin: 0; display: grid; gap: 0; border-top: 1px solid var(--ink); }
+  .facts div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .facts dt { color: var(--ink-2); }
+  .facts dd { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(1.8rem, 3.4vw, 2.6rem); line-height: 1; font-variation-settings: 'wdth' 125, 'wght' 700; font-variant-numeric: tabular-nums; }
+  .cta { grid-area: cta; display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; border-radius: 999px;
+    border: 1px solid var(--ink); background: transparent; color: var(--ink); font: inherit; font-size: 0.95rem; font-weight: 500;
+    text-decoration: none; cursor: pointer; transition: background-color 0.2s, color 0.2s, transform 0.2s var(--ease);
+  }
+  .btn:hover { background: var(--ink); color: var(--bg); }
+  .btn:active { transform: scale(0.97); }
+  .btn.solid { background: var(--ink); color: var(--bg); }
+  .btn.solid:hover { background: var(--accent); border-color: var(--accent); color: #111814; }
+
+  /* Shared section heads */
+  .sec-head { display: grid; gap: 12px; padding-top: 18px; border-top: 1px solid var(--ink); margin-bottom: clamp(28px, 4vw, 48px); }
+  .sec-head h2 { margin: 0; font-family: var(--display); font-weight: 800; font-variation-settings: 'wdth' 120, 'wght' 800; font-size: clamp(2.2rem, 5.4vw, 4.4rem); line-height: 0.95; letter-spacing: -0.02em; }
+  .sec-lede { margin: 0; color: var(--ink-2); max-width: 58ch; }
+
+  /* Release notes */
+  .releases, .stack, .news { padding-block: 0; }
+  .panel > .sec-head { border-top: 0; padding-top: 0; }
+  .rel-list { list-style: none; margin: 0; padding: 0; }
+  .rel { display: grid; grid-template-columns: minmax(140px, 0.6fr) minmax(0, 1.4fr); gap: clamp(16px, 4vw, 64px); padding: 28px 0; border-bottom: 1px solid var(--line); }
+  .rel-tag { display: flex; flex-direction: column; gap: 6px; align-self: start; position: sticky; top: 84px; }
+  .rel-v {
+    font-family: var(--display); font-weight: 800; font-size: clamp(1.9rem, 3.6vw, 3rem); line-height: 0.95; letter-spacing: -0.02em;
+    font-variation-settings: 'wdth' 75, 'wght' 800; color: var(--ink); transition: font-variation-settings 0.6s var(--ease), color 0.3s;
+  }
+  .rel:hover .rel-v { font-variation-settings: 'wdth' 105, 'wght' 800; color: var(--accent-ink); }
+  .rel-y { color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.7rem; }
+  .rel-body h3 { margin: 6px 0 12px; font-size: 1.35rem; font-weight: 600; letter-spacing: -0.01em; }
+  .rel-body ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .earlier .rel-v { color: var(--ink-2); }
+  .earlier .rel-body p { margin: 0; color: var(--ink-2); max-width: 62ch; }
+  .rel.earlier { border-bottom: 0; }
+  /* Highlights grouped by what was done; each group carries its own tone. */
+  .wins { margin: 0; display: grid; gap: 0; }
+  .win { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .win:first-child { border-top: 0; padding-top: 0; }
+  .win dt { align-self: start; justify-self: start; padding: 4px 10px; border-radius: 999px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--tone); border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent); background: color-mix(in srgb, var(--tone) 10%, transparent); white-space: nowrap; }
+  .win dd { margin: 0; }
+  .win ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .win li { position: relative; padding-left: 16px; }
+  .win li::before { content: ''; position: absolute; left: 0; top: 0.68em; width: 6px; height: 6px; border-radius: 50%; background: var(--tone); }
+
+  /* Skill groups */
+  .groups { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .group { display: grid; gap: 14px; align-content: start; padding: clamp(18px, 3vw, 28px); border: 1px solid var(--line); border-radius: 18px; background: var(--surface); transition: border-color 0.2s, transform 0.3s var(--ease); }
+  .group:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .g-n { color: var(--accent-ink); }
+  .group h3 { margin: 0; font-family: var(--display); font-weight: 800; font-variation-settings: 'wdth' 115, 'wght' 800; font-size: clamp(1.4rem, 2.4vw, 1.9rem); line-height: 1; letter-spacing: -0.01em; }
+  .chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips li { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: 0.9rem; background: color-mix(in srgb, var(--bg) 60%, transparent); }
+
+  /* AI news ticker: two copies of the list scroll as one loop; hover, focus or the button pauses it. */
+  .ticker { display: flex; overflow: hidden; margin-inline: calc(-1 * clamp(20px, 4vw, 56px)); mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent); }
+  .tick-row { list-style: none; margin: 0; padding: 0; display: flex; flex-shrink: 0; animation: tick var(--dur) linear infinite; }
+  .ticker:hover .tick-row, .ticker:focus-within .tick-row, .ticker.paused .tick-row { animation-play-state: paused; }
+  @keyframes tick { to { transform: translateX(-100%); } }
+  .tick-row li { display: flex; }
+  .tick-row a { display: grid; align-content: start; gap: 8px; width: clamp(240px, 26vw, 340px); margin-right: 16px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); text-decoration: none; transition: border-color 0.2s, transform 0.3s var(--ease); }
+  .tick-row a:hover, .tick-row a:focus-visible { border-color: var(--accent); transform: translateY(-2px); }
+  .t-src { color: var(--accent-ink); text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.7rem; }
+  .t-title { font-weight: 500; line-height: 1.35; letter-spacing: -0.01em; }
+  .tick-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 20px; }
+  .tick-foot p { margin: 0; color: var(--ink-2); }
+  .btn.small { min-height: 40px; padding: 0 16px; font-size: 0.85rem; }
+
+  /* Contact */
+  .contact { margin-top: 0; min-height: 100svh; display: flex; align-items: flex-end; background: linear-gradient(to top, rgb(8 7 20 / 0.85) 15%, transparent 75%); }
+  .contact-inner { padding-block: 40svh clamp(56px, 9vw, 120px); width: 100%; }
+  .contact .eyebrow { color: var(--accent); }
+  .big { margin: 10px 0 32px; font-family: var(--display); font-weight: 800; font-variation-settings: 'wdth' 120, 'wght' 800; font-size: clamp(2.8rem, 8.5vw, 7.4rem); line-height: 0.9; letter-spacing: -0.025em; max-width: 12ch; }
+  .mail { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding-block: 20px; border-block: 1px solid var(--line); }
+  .addr { font-size: clamp(1.4rem, 4vw, 2.6rem); font-weight: 500; letter-spacing: -0.02em; text-decoration: none; overflow-wrap: anywhere; min-width: 0; }
+  .addr:hover { color: var(--accent); }
+  .contact .btn:hover { background: var(--ink); color: var(--bg); }
+  .links { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 24px 0 0; padding: 0; }
+  .links a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; color: var(--ink-2); }
+  .links a:hover { color: var(--accent); }
+
+  @media (max-width: 1100px) { .hud { display: none; } }
+  @media (max-width: 860px) {
+    .below { grid-template-columns: 1fr; grid-template-areas: 'intro' 'cta' 'facts'; }
+    .window { height: 56svh; }
+    .panel { border-radius: 20px; }
+  }
+  @media (max-width: 560px) {
+    .rel { grid-template-columns: 1fr; gap: 8px; }
+    .rel-tag { position: static; flex-direction: row; align-items: baseline; gap: 12px; }
+    .win { grid-template-columns: 1fr; gap: 8px; }
+    .groups { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rel-v, .group, .tick-row a { transition: none; }
+    .ticker { overflow-x: auto; mask-image: none; -webkit-mask-image: none; }
+    .tick-row { animation: none; }
+    .tick-row[inert], .tick-foot .btn { display: none; }
+  }
+</style>
+
+<script>
+  import { profile } from '../data/profile';
+  import { startFlight } from '../scripts/terrain';
+
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Live clock in Dubai time.
+  const clock = document.querySelector<HTMLTimeElement>('[data-clock]');
+  if (clock) {
+    const fmt = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: profile.timezone });
+    const tick = () => (clock.textContent = fmt.format(new Date()));
+    tick();
+    setInterval(tick, 15_000);
+  }
+
+  // Elastic name: letters near the pointer stretch wide and heavy, the rest condense,
+  // so each line keeps roughly the same overall width.
+  const hero = document.querySelector<HTMLElement>('[data-hero]')!;
+  const lines = [...hero.querySelectorAll<HTMLElement>('[data-line]')].map((line) =>
+    [...line.querySelectorAll<HTMLElement>('.ch')].map((el) => ({ el, w: 100, g: 800 })),
+  );
+  let px: number | null = null;
+  let running = false;
+
+  const frame = () => {
+    let moving = false;
+    for (const letters of lines) {
+      const pulls = letters.map(({ el }) => {
+        if (px === null) return 0;
+        const r = el.getBoundingClientRect();
+        const d = (px - (r.left + r.width / 2)) / Math.max(120, r.width * 1.4);
+        return Math.exp(-d * d);
+      });
+      const mean = pulls.reduce((a, b) => a + b, 0) / pulls.length;
+      letters.forEach((l, i) => {
+        const tw = px === null ? 100 : Math.min(150, Math.max(55, 100 + 120 * (pulls[i] - mean)));
+        const tg = px === null ? 800 : 480 + 420 * pulls[i];
+        l.w += (tw - l.w) * 0.14;
+        l.g += (tg - l.g) * 0.14;
+        if (Math.abs(tw - l.w) > 0.3 || Math.abs(tg - l.g) > 0.5) moving = true;
+        l.el.style.setProperty('--w', l.w.toFixed(1));
+        l.el.style.setProperty('--g', l.g.toFixed(0));
+      });
+    }
+    if (moving || px !== null) requestAnimationFrame(frame);
+    else running = false;
+  };
+  const kick = () => {
+    if (!running) { running = true; requestAnimationFrame(frame); }
+  };
+
+  if (!reduced) {
+    hero.addEventListener('pointermove', (e) => { px = e.clientX; kick(); });
+    hero.addEventListener('pointerleave', () => { px = null; kick(); });
+    hero.addEventListener('pointercancel', () => { px = null; kick(); });
+
+    // One sweep across the name on load to show it responds.
+    const t0 = performance.now();
+    const sweep = (now: number) => {
+      const p = (now - t0) / 1600;
+      if (p >= 1) { px = null; kick(); return; }
+      const box = hero.getBoundingClientRect();
+      px = box.left + box.width * (0.05 + 0.9 * (p < 0.5 ? 2 * p * p : 1 - (-2 * p + 2) ** 2 / 2));
+      kick();
+      requestAnimationFrame(sweep);
+    };
+    setTimeout(() => requestAnimationFrame(sweep), 400);
+  }
+
+  // Flight: scrolling moves the camera forward through the illustrated ridges and up to the summit.
+  // With reduced motion the scene holds one still view instead.
+  const flight = startFlight(document.querySelector<HTMLCanvasElement>('[data-sky]')!, { reduced });
+  const hud = document.querySelector<HTMLElement>('.hud')!;
+  const altEl = hud.querySelector<HTMLElement>('[data-alt]')!;
+  const summit = Number(hud.dataset.summit);
+
+  const fly = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+    flight.setProgress(reduced ? 0.35 : p);
+    hud.style.setProperty('--p', p.toFixed(4));
+    altEl.textContent = Math.round(p * summit).toLocaleString('en-GB');
+  };
+  let queued = false;
+  addEventListener('scroll', () => {
+    if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; fly(); }); }
+  }, { passive: true });
+  addEventListener('resize', fly);
+  fly();
+
+  // Ticker pause button (WCAG 2.2.2: moving content needs a way to stop it).
+  const ticker = document.querySelector<HTMLElement>('[data-ticker]');
+  const tickBtn = document.querySelector<HTMLButtonElement>('[data-tick-toggle]');
+  tickBtn?.addEventListener('click', () => {
+    const paused = ticker!.classList.toggle('paused');
+    tickBtn.setAttribute('aria-pressed', String(paused));
+    tickBtn.textContent = paused ? 'Play' : 'Pause';
+  });
+
+  // Drag (or click) the altitude gauge to scroll: bottom is the trailhead, top is the summit.
+  const track = hud.querySelector<HTMLElement>('[data-hud-track]')!;
+  const seek = (e: PointerEvent) => {
+    const r = track.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (r.bottom - e.clientY) / r.height));
+    scrollTo({ top: p * (document.documentElement.scrollHeight - innerHeight), behavior: 'instant' });
+  };
+  track.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    track.setPointerCapture(e.pointerId);
+    hud.classList.add('dragging');
+    seek(e);
+  });
+  track.addEventListener('pointermove', (e) => { if (track.hasPointerCapture(e.pointerId)) seek(e); });
+  const release = () => hud.classList.remove('dragging');
+  track.addEventListener('pointerup', release);
+  track.addEventListener('pointercancel', release);
+
+  // Copy email.
+  const btn = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const label = btn?.querySelector<HTMLElement>('[data-copy-label]');
+  btn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy!);
+      label!.textContent = 'Copied';
+    } catch {
+      const sel = getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(document.querySelector('.addr')!);
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+      label!.textContent = 'Selected, press ⌘C';
+    }
+    setTimeout(() => (label!.textContent = 'Copy email'), 2000);
+  });
+</script>

@@ -5,12 +5,20 @@ export const since = (year: number) => NOW.getFullYear() - year;
 
 export const profile = {
   name: 'Arjun T Raj',
-  role: 'Agentic Developer',
+  role: 'Agentic AI Engineer & React Native Developer',
   location: 'Dubai, UAE',
   timezone: 'Asia/Dubai',
   email: 'mail@arjuntraj.in',
   intro: 'I design, code, and build things for the Internet & Mobile.',
-  description: 'Arjun T Raj, agentic developer in Dubai. I design, code, and build things for the Internet & Mobile.',
+  description:
+    'Arjun T Raj, agentic AI engineer and React Native developer in Dubai, UAE. AI agents, LLM apps, iOS, Android and web. 15+ years, 70+ apps delivered.',
+  // Topics for search engines (schema.org knowsAbout); keep them true to the skills below.
+  knowsAbout: [
+    'Agentic engineering', 'Agentic AI', 'AI agents', 'Generative AI', 'Large language models (LLMs)', 'Retrieval-augmented generation (RAG)',
+    'Forward deployed engineering', 'AI-assisted software development', 'AI automation', 'Model Context Protocol', 'GitHub Copilot', 'Claude',
+    'React Native', 'Mobile app development', 'Mobile architecture', 'iOS development', 'Swift', 'Android development',
+    'React', 'Next.js', 'JavaScript', 'TypeScript', 'Node.js', 'Micro-frontends', 'Mobile security', 'CI/CD', 'Digital banking', 'Fintech',
+  ],
   links: [
     { label: 'LinkedIn', href: 'https://in.linkedin.com/pub/arjun-t-raj/59/45/836' },
   ],
@@ -79,8 +87,20 @@ export const earlier = {
 
 // A curated few per group, not everything ever used.
 export const skillGroups = [
-  { name: 'Agentic engineering', skills: ['Agentic SDLC', 'Custom agents & MCP', 'Spec-driven development', 'GitHub Copilot & Claude'] },
+  { name: 'Agentic AI engineering', skills: ['Agentic SDLC', 'AI agents & MCP', 'LLM apps & RAG', 'Forward deployed engineering (FDE)', 'Spec-driven development', 'GitHub Copilot & Claude'] },
   { name: 'Mobile', skills: ['React Native', 'iOS · Swift', 'Android', 'Mobile security (OWASP MASVS)'] },
   { name: 'Web & platform', skills: ['JavaScript & TypeScript', 'React & Next.js', 'Micro-frontends', 'Node.js & BFF', 'Spring Boot microservices'] },
   { name: 'Delivery & leadership', skills: ['Release automation', 'Developer experience', 'Architecture governance', 'Team leadership'] },
 ];
+
+// The person behind the work. Keep it light.
+export const offClock = {
+  lines: [
+    { icon: 'coffee', text: 'Coffee first, code second.' },
+    { icon: 'family', text: 'Father of two.' },
+  ],
+  links: [
+    { kicker: 'Website', label: "Adveka's website", note: 'My daughter has her own corner of the internet.', href: 'https://advekatarjun.com/', cta: 'advekatarjun.com' },
+    { kicker: 'Book', label: 'Life of Doom', note: 'Written by Adveka. Her story, now a published book.', href: 'https://www.amazon.com/dp/B0HPYB4HGS', cta: 'Buy on Amazon' },
+  ],
+};

@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { profile, facts, releases, earlier, skillGroups } from '../data/profile';
+import { profile, facts, releases, earlier, skillGroups, offClock } from '../data/profile';
 import { getHeadlines } from '../data/news';
 
 const lines = ['ARJUN', 'T RAJ'];
@@ -62,7 +62,7 @@ const builtOn = day.format(new Date());
     <header class="sec-head">
       <p class="eyebrow">CHANGELOG.md</p>
       <h2 id="rel-h">Release notes</h2>
-      <p class="sec-lede">Where I am now, in full. Earlier roles are folded into one line.</p>
+      <p class="sec-lede">Principal engineer leading mobile and web architecture for digital banking in the UAE. Where I am now, in full; earlier roles are folded into one line.</p>
     </header>
 
     <ol class="rel-list">
@@ -108,7 +108,7 @@ const builtOn = day.format(new Date());
     <header class="sec-head">
       <p class="eyebrow">Stack</p>
       <h2 id="stack-h">Skills</h2>
-      <p class="sec-lede">What I reach for, grouped. Not everything I've used, just what I lead with.</p>
+      <p class="sec-lede">Agentic engineering, React Native and native iOS and Android, and the web platforms behind them. Built from Dubai for teams in Abu Dhabi, across the UAE and the wider GCC.</p>
     </header>
 
     <ul class="groups">
@@ -128,7 +128,7 @@ const builtOn = day.format(new Date());
   </div>
 
   {headlines.length > 0 && (
-    <section class="news shell" aria-labelledby="news-h">
+    <section id="signal" class="news shell" aria-labelledby="news-h">
       <div class="panel">
       <header class="sec-head">
         <p class="eyebrow">Signal · Updated {builtOn}</p>
@@ -156,6 +156,43 @@ const builtOn = day.format(new Date());
       </div>
     </section>
   )}
+
+  <section id="off-the-clock" class="life shell" aria-labelledby="life-h">
+    <div class="panel">
+    <header class="sec-head">
+      <p class="eyebrow">Off the clock</p>
+      <h2 id="life-h">When I'm not shipping</h2>
+    </header>
+    <div class="life-grid">
+      <ul class="life-lines">
+        {offClock.lines.map((l) => (
+          <li>
+            <span class="glyph" aria-hidden="true">
+              {l.icon === 'coffee' ? (
+                <svg viewBox="0 0 24 24"><path d="M4 9h12v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM16 10.5h1.5a2.5 2.5 0 0 1 0 5H16M8 3.5c-.6.8-.6 1.7 0 2.5M11.5 3.5c-.6.8-.6 1.7 0 2.5" /></svg>
+              ) : (
+                <svg viewBox="0 0 24 24"><circle cx="8" cy="6" r="2.5" /><path d="M3.5 20v-5a4.5 4.5 0 0 1 9 0v5" /><circle cx="16.5" cy="10" r="2" /><path d="M13.5 20v-3a3 3 0 0 1 6 0v3" /><circle cx="20.5" cy="13.5" r="1.3" /></svg>
+              )}
+            </span>
+            {l.text}
+          </li>
+        ))}
+      </ul>
+      <ul class="life-cards">
+        {offClock.links.map((l) => (
+          <li>
+            <a href={l.href} target="_blank" rel="noopener noreferrer">
+              <span class="t-src mono">{l.kicker}</span>
+              <strong>{l.label}</strong>
+              <span class="life-note">{l.note}</span>
+              <span class="life-cta mono">{l.cta}<span aria-hidden="true"> ↗</span></span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+    </div>
+  </section>
 
   <section id="contact" class="contact" aria-labelledby="contact-h">
     <div class="shell contact-inner">
@@ -247,7 +284,7 @@ const builtOn = day.format(new Date());
   .sec-lede { margin: 0; color: var(--ink-2); max-width: 58ch; }
 
   /* Release notes */
-  .releases, .stack, .news { padding-block: 0; }
+  .releases, .stack, .news, .life { padding-block: 0; }
   .panel > .sec-head { border-top: 0; padding-top: 0; }
   .rel-list { list-style: none; margin: 0; padding: 0; }
   .rel { display: grid; grid-template-columns: minmax(140px, 0.6fr) minmax(0, 1.4fr); gap: clamp(16px, 4vw, 64px); padding: 28px 0; border-bottom: 1px solid var(--line); }
@@ -296,6 +333,21 @@ const builtOn = day.format(new Date());
   .tick-foot p { margin: 0; color: var(--ink-2); }
   .btn.small { min-height: 40px; padding: 0 16px; font-size: 0.85rem; }
 
+  /* Off the clock: a light postscript before contact. */
+  .life { margin-top: clamp(24px, 4vw, 40px); }
+  .life .sec-head { margin-bottom: clamp(20px, 3vw, 32px); }
+  .life-grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(20px, 4vw, 56px); align-items: start; }
+  .life-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; font-size: clamp(1.15rem, 1.8vw, 1.4rem); line-height: 1.35; letter-spacing: -0.01em; }
+  .life-lines li { display: flex; align-items: center; gap: 14px; }
+  .glyph { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--accent-ink); }
+  .glyph svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .life-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .life-cards a { display: grid; gap: 8px; height: 100%; padding: 18px 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); text-decoration: none; transition: border-color 0.2s, transform 0.3s var(--ease); }
+  .life-cards a:hover, .life-cards a:focus-visible { border-color: var(--accent); transform: translateY(-2px); }
+  .life-cards strong { font-family: var(--display); font-weight: 800; font-variation-settings: 'wdth' 115, 'wght' 800; font-size: 1.35rem; line-height: 1.05; }
+  .life-note { color: var(--ink-2); font-size: 0.95rem; line-height: 1.45; }
+  .life-cta { color: var(--accent-ink); margin-top: 4px; }
+
   /* Contact */
   .contact { margin-top: 0; min-height: 100svh; display: flex; align-items: flex-end; background: linear-gradient(to top, rgb(8 7 20 / 0.85) 15%, transparent 75%); }
   .contact-inner { padding-block: 40svh clamp(56px, 9vw, 120px); width: 100%; }
@@ -311,6 +363,7 @@ const builtOn = day.format(new Date());
 
   @media (max-width: 1100px) { .hud { display: none; } }
   @media (max-width: 860px) {
+    .life-grid { grid-template-columns: 1fr; }
     .below { grid-template-columns: 1fr; grid-template-areas: 'intro' 'cta' 'facts'; }
     .window { height: 56svh; }
     .panel { border-radius: 20px; }
@@ -320,9 +373,10 @@ const builtOn = day.format(new Date());
     .rel-tag { position: static; flex-direction: row; align-items: baseline; gap: 12px; }
     .win { grid-template-columns: 1fr; gap: 8px; }
     .groups { grid-template-columns: 1fr; }
+    .life-cards { grid-template-columns: 1fr; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .rel-v, .group, .tick-row a { transition: none; }
+    .rel-v, .group, .tick-row a, .life-cards a { transition: none; }
     .ticker { overflow-x: auto; mask-image: none; -webkit-mask-image: none; }
     .tick-row { animation: none; }
     .tick-row[inert], .tick-foot .btn { display: none; }
